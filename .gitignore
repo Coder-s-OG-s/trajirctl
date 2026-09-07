@@ -1,0 +1,3 @@
+/trajirctl
+*.sqlite
+*.sqlite-journal
