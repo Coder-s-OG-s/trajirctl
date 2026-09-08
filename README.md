@@ -1,7 +1,7 @@
 # trajirctl
 
-Human-operated CLI for local [Trajectory IR](https://github.com/Coder-s-OG-s/Trajectory-IR)
-workdirs, plus **MCP host packaging** for the agent-facing `trajir-mcp` server.
+Human operated CLI for local [Trajectory IR](https://github.com/Coder-s-OG-s/Trajectory-IR)
+workdirs, plus **MCP host packaging** for the agent facing `trajir-mcp` server.
 
 | Surface | What you use | Audience |
 |---------|--------------|----------|
@@ -10,18 +10,18 @@ workdirs, plus **MCP host packaging** for the agent-facing `trajir-mcp` server.
 
 Both call the same Go SDK (`github.com/Coder-s-OG-s/Trajectory-IR/go`). The MCP
 server enforces `TRAJIR_MCP_ROOT` workspace confinement (CWE-73). `trajirctl`
-does **not** — a person typing `--workdir` is the trust boundary. Design
+does **not**: a person typing `--workdir` is the trust boundary. Design
 rationale:
 [`docs/superpowers/specs/2026-08-27-trajirctl-design.md`](https://github.com/Coder-s-OG-s/Trajectory-IR/blob/main/docs/superpowers/specs/2026-08-27-trajirctl-design.md).
 
-**License:** [Apache-2.0](LICENSE) · **Go:** 1.25+ · **Latest tag:** [`v0.1.0`](https://github.com/Coder-s-OG-s/trajirctl/releases/tag/v0.1.0)
+**License:** [Apache 2.0](LICENSE) · **Go:** 1.25+ · **Latest tag:** [`v0.1.0`](https://github.com/Coder-s-OG-s/trajirctl/releases/tag/v0.1.0)
 
 ---
 
 ## What is Trajectory IR?
 
 Trajectory IR is a portable intermediate representation for agent runs: an
-append-only sequence of typed nodes. Before world-changing tools execute, the
+append only sequence of typed nodes. Before world changing tools execute, the
 model’s plan for that step is **sealed**. Workdirs store that history in
 `nodes.sqlite` (+ `memo.sqlite`); packages export as `.tir` for audit, handoff,
 or verification outside the runtime that produced them.
@@ -146,13 +146,13 @@ go build -o trajir-mcp ./cmd/trajir-mcp
 
 | Variable | Meaning |
 |----------|---------|
-| `TRAJIR_MCP_ROOT` | Approved workspace root. Every MCP `work_dir`, `dest`, and `path` must resolve under this directory. When unset, process cwd is used — **always set it explicitly**. |
+| `TRAJIR_MCP_ROOT` | Approved workspace root. Every MCP `work_dir`, `dest`, and `path` must resolve under this directory. When unset, process cwd is used: **always set it explicitly**. |
 
 Templates:
 
 | File | Use |
 |------|-----|
-| [`integrations/mcp/claude-code.mcp.json`](integrations/mcp/claude-code.mcp.json) | Claude Code / Cursor-style `mcpServers` |
+| [`integrations/mcp/claude-code.mcp.json`](integrations/mcp/claude-code.mcp.json) | Claude Code / Cursor style `mcpServers` |
 | [`integrations/mcp/cursor.mcp.json`](integrations/mcp/cursor.mcp.json) | Cursor MCP snippet |
 | [`integrations/mcp/README.md`](integrations/mcp/README.md) | Full MCP packaging guide |
 
@@ -172,7 +172,7 @@ Generate a filled JSON blob:
 |------|---------|
 | `trajectory_status` | Node counts by kind, seal count, paths |
 | `trajectory_export_tir` | Export thin (default) or fat `.tir` |
-| `trajectory_import_tir` | Load + hash-verify a `.tir` (**does not** write into NodeLog) |
+| `trajectory_import_tir` | Load and hash verify a `.tir` (**does not** write into NodeLog) |
 | `trajectory_verify_signature` | Optional `trajir-pkg-sig-v1` verify; unsigned OK unless `require_signature` |
 
 Common arguments: `work_dir`, `tenant_id`, `trajectory_id`, `path` / `dest`.
@@ -187,7 +187,7 @@ Contract reference:
 | Agent reads / exports / verifies inside a project | **MCP** (`trajir-mcp` + `TRAJIR_MCP_ROOT`) |
 | You inspect a workdir at the terminal | **`trajirctl`** |
 | CI checks a `.tir` package | **`trajirctl verify --require-signature`** |
-| Browse individual nodes | **`trajirctl nodes list` / `nodes show`** (CLI-only; MCP has no per-node tools) |
+| Browse individual nodes | **`trajirctl nodes list` / `nodes show`** (CLI only; MCP has no per node tools) |
 
 ---
 
@@ -236,7 +236,7 @@ Write a `.tir` package. Modes:
 
 ```bash
 trajirctl export --dest ./out.tir --mode thin
-trajirctl export --dest ./out-fat.tir --mode fat --json
+trajirctl export --dest ./outfat.tir --mode fat --json
 ```
 
 #### `import`
@@ -261,12 +261,12 @@ Check package signature policy.
 
 ```bash
 trajirctl verify --path ./out.tir
-trajirctl verify --path ./out.tir --require-signature   # fail-closed for CI
+trajirctl verify --path ./out.tir --require-signature   # fail closed for CI
 ```
 
 #### `nodes list` / `nodes show`
 
-Terminal-native per-node browsing (not exposed on MCP).
+Terminal native per node browsing (not exposed on MCP).
 
 ```bash
 trajirctl nodes list
@@ -274,18 +274,18 @@ trajirctl nodes list --json
 trajirctl nodes show --id <NODE_ID>
 ```
 
-Missing `--id` → prints `node not found` and exits `1`.
+Missing `--id` prints `node not found` and exits `1`.
 
 ### Output and exit codes
 
-- Default: human-readable text on stdout
+- Default: human readable text on stdout
 - `--json`: indented JSON with the same fields
 - Errors: message on stderr
 
 | Code | Meaning |
 |------|---------|
 | `0` | Success |
-| `1` | Runtime error (including verify `failed`, nodes show not-found) |
+| `1` | Runtime error (including verify `failed`, nodes show not found) |
 | `2` | Usage / unknown command |
 
 ---
@@ -311,13 +311,13 @@ trajirctl/
   internal/               # workdir/env resolution + text/JSON render
   integrations/mcp/       # host config templates + MCP packaging README
   scripts/                # helpers to print filled mcpServers JSON
-  .github/workflows/      # CI (when present on the branch)
-  LICENSE                 # Apache-2.0
+  .github/workflows/      # CI
+  LICENSE                 # Apache 2.0
 ```
 
 ---
 
-## Scope and non-goals
+## Scope and non goals
 
 **In scope (v1):**
 

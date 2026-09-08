@@ -1,6 +1,6 @@
 # Trajectory IR MCP host packaging
 
-This folder is the **host-facing** packaging surface for Trajectory IR’s MCP
+This folder is the **host facing** packaging surface for Trajectory IR’s MCP
 server. IR semantics and the `trajir-mcp` binary live in
 [Trajectory-IR](https://github.com/Coder-s-OG-s/Trajectory-IR)
 (`go/cmd/trajir-mcp`, `go/trajir/mcp`). Here we only document how to wire the
@@ -35,8 +35,8 @@ Requires Go 1.25+.
 
 `TRAJIR_MCP_ROOT` is the approved workspace root. Every MCP `work_dir`,
 `dest`, and `path` argument must resolve under it (CWE-73 defense against
-prompt-injected path steering). When unset, the process cwd is used as the
-root — always set it explicitly in host configs.
+prompt injected path steering). When unset, the process cwd is used as the
+root: always set it explicitly in host configs.
 
 | Variable | Meaning |
 |----------|---------|
@@ -46,7 +46,7 @@ Example host configs in this directory:
 
 | File | Host |
 |------|------|
-| [`claude-code.mcp.json`](./claude-code.mcp.json) | Claude Code / Cursor-style `mcpServers` |
+| [`claude-code.mcp.json`](./claude-code.mcp.json) | Claude Code / Cursor style `mcpServers` |
 | [`cursor.mcp.json`](./cursor.mcp.json) | Cursor MCP config snippet |
 
 Replace `__TRAJIR_MCP_BIN__` and `__PROJECT_ROOT__` with absolute paths before
@@ -74,12 +74,12 @@ installing.
 |------|---------|
 | `trajectory_status` | Node counts by kind, seal count, paths |
 | `trajectory_export_tir` | Export thin (default) or fat `.tir` |
-| `trajectory_import_tir` | Load + hash-verify `.tir` (no NodeLog write) |
+| `trajectory_import_tir` | Load and hash verify `.tir` (no NodeLog write) |
 | `trajectory_verify_signature` | Optional signature verify; unsigned OK unless `require_signature` |
 
 Common args: `work_dir`, `tenant_id`, `trajectory_id`, `path` / `dest`.
 
-## Day-to-day: agents vs humans
+## Day to day: agents vs humans
 
 | Task | Use |
 |------|-----|
@@ -91,10 +91,10 @@ Common args: `work_dir`, `tenant_id`, `trajectory_id`, `path` / `dest`.
 typing `--workdir ./data` is the trust boundary. See the design spec in
 Trajectory-IR: `docs/superpowers/specs/2026-08-27-trajirctl-design.md`.
 
-## Smoke-test the MCP binary
+## Smoke test the MCP binary
 
 ```bash
-# stdio server waits for an MCP host — use your host’s MCP inspector,
+# stdio server waits for an MCP host: use your host’s MCP inspector,
 # or confirm the binary starts and exits cleanly on EOF:
 printf '' | ./trajir-mcp ; echo exit:$?
 ```
