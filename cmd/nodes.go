@@ -115,5 +115,8 @@ func RunNodesShow(args []string, stdout io.Writer) (internal.NodeShowResult, err
 	if err := internal.Render(stdout, *jsonFlag, result); err != nil {
 		return zero, err
 	}
+	if !result.Found {
+		return result, fmt.Errorf("trajirctl nodes show: node %q not found", *id)
+	}
 	return result, nil
 }

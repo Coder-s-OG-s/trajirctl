@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 
 	"github.com/Coder-s-OG-s/Trajectory-IR/go/trajir/tir"
 
@@ -13,29 +12,33 @@ import (
 )
 
 // RunImport implements `trajirctl import`: it loads and reports on a .tir
-// package. --workdir is accepted for flag-surface consistency but unused.
+// package (no NodeLog write — same as MCP trajectory_import_tir).
+// --workdir is accepted for flag-surface consistency but unused.
+// --path is preferred; --src is accepted as an alias.
 func RunImport(args []string, stdout io.Writer) (internal.ImportResult, error) {
 	var zero internal.ImportResult
 	fs := flag.NewFlagSet("import", flag.ContinueOnError)
 	fs.String("workdir", "", "unused by import; accepted for CLI consistency")
-	src := fs.String("src", "", "path to the .tir package to load (required)")
+	pathFlag := fs.String("path", "", "path to the .tir package to load (preferred)")
+	srcFlag := fs.String("src", "", "alias for --path")
 	jsonFlag := fs.Bool("json", false, "emit JSON instead of text")
 	if err := fs.Parse(args); err != nil {
 		return zero, err
 	}
 
-	if strings.TrimSpace(*src) == "" {
-		return zero, fmt.Errorf("trajirctl import: --src is required")
+	src, err := resolvePackagePath("trajirctl import", *pathFlag, *srcFlag)
+	if err != nil {
+		return zero, err
 	}
-	info, err := os.Stat(*src)
+	info, err := os.Stat(src)
 	if err != nil {
 		return zero, fmt.Errorf("trajirctl import: %w", err)
 	}
 	if !info.Mode().IsRegular() {
-		return zero, fmt.Errorf("trajirctl import: %q is not a regular file", *src)
+		return zero, fmt.Errorf("trajirctl import: %q is not a regular file", src)
 	}
 
-	pkg, err := tir.Load(*src)
+	pkg, err := tir.Load(src)
 	if err != nil {
 		return zero, fmt.Errorf("trajirctl import: %w", err)
 	}
@@ -45,7 +48,7 @@ func RunImport(args []string, stdout io.Writer) (internal.ImportResult, error) {
 	tenantID, _ := pkg.Manifest["tenant_id"].(string)
 
 	result := internal.ImportResult{
-		Path:         *src,
+		Path:         src,
 		Mode:         mode,
 		TrajectoryID: trajectoryID,
 		TenantID:     tenantID,

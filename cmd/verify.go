@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/Coder-s-OG-s/Trajectory-IR/go/trajir/tir"
 
@@ -13,25 +12,29 @@ import (
 )
 
 // RunVerify implements `trajirctl verify`.
+// --path is preferred; --src is accepted as an alias for MCP/CLI parity.
+// Status "failed" is rendered then returned as an error so the process exits 1.
 func RunVerify(args []string, stdout io.Writer) (internal.VerifyResult, error) {
 	var zero internal.VerifyResult
 	fs := flag.NewFlagSet("verify", flag.ContinueOnError)
-	path := fs.String("path", "", "path to the .tir package to verify (required)")
+	pathFlag := fs.String("path", "", "path to the .tir package to verify (preferred)")
+	srcFlag := fs.String("src", "", "alias for --path")
 	requireSignature := fs.Bool("require-signature", false, "fail if the package is unsigned")
 	jsonFlag := fs.Bool("json", false, "emit JSON instead of text")
 	if err := fs.Parse(args); err != nil {
 		return zero, err
 	}
-	if strings.TrimSpace(*path) == "" {
-		return zero, fmt.Errorf("trajirctl verify: --path is required")
+	path, err := resolvePackagePath("trajirctl verify", *pathFlag, *srcFlag)
+	if err != nil {
+		return zero, err
 	}
 
-	info, err := tir.Verify(*path, tir.VerifyOptions{RequireSignature: *requireSignature})
+	info, err := tir.Verify(path, tir.VerifyOptions{RequireSignature: *requireSignature})
 	var result internal.VerifyResult
 	if err != nil {
 		if errors.Is(err, tir.ErrSignature) {
 			result = internal.VerifyResult{
-				Path:     *path,
+				Path:     path,
 				Status:   "failed",
 				Verified: false,
 				Message:  err.Error(),
@@ -41,7 +44,7 @@ func RunVerify(args []string, stdout io.Writer) (internal.VerifyResult, error) {
 		}
 	} else if info == nil {
 		result = internal.VerifyResult{
-			Path:     *path,
+			Path:     path,
 			Status:   "unsigned",
 			Signed:   false,
 			Verified: false,
@@ -53,7 +56,7 @@ func RunVerify(args []string, stdout io.Writer) (internal.VerifyResult, error) {
 			scheme = info.Document.Scheme
 		}
 		result = internal.VerifyResult{
-			Path:       *path,
+			Path:       path,
 			Status:     "verified",
 			Signed:     true,
 			Verified:   true,
@@ -67,6 +70,9 @@ func RunVerify(args []string, stdout io.Writer) (internal.VerifyResult, error) {
 
 	if err := internal.Render(stdout, *jsonFlag, result); err != nil {
 		return zero, err
+	}
+	if result.Status == "failed" {
+		return result, fmt.Errorf("trajirctl verify: %s", result.Message)
 	}
 	return result, nil
 }

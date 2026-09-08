@@ -67,8 +67,8 @@ func usage() {
 commands:
   status --workdir DIR --tenant ID --trajectory ID [--json]
   export --workdir DIR --tenant ID --trajectory ID --dest PATH [--mode thin|fat] [--json]
-  import --src PATH [--json]
-  verify --path PATH [--require-signature] [--json]
+  import --path PATH [--src PATH] [--json]
+  verify --path PATH [--src PATH] [--require-signature] [--json]
   nodes list --workdir DIR --tenant ID --trajectory ID [--json]
   nodes show --workdir DIR --tenant ID --trajectory ID --id NODE_ID [--json]`)
 }
