@@ -311,9 +311,11 @@ trajirctl/
   internal/               # workdir/env resolution + text/JSON render
   integrations/mcp/       # host config templates + MCP packaging README
   scripts/                # helpers to print filled mcpServers JSON
-  .github/workflows/      # CI
-  LICENSE                 # Apache 2.0
+  docs/ci-github-actions.yml  # CI workflow template (copy to .github/workflows/ci.yml)
+  LICENSE                     # Apache 2.0
 ```
+
+CI template: [`docs/ci-github-actions.yml`](docs/ci-github-actions.yml) runs `gofmt`, `go vet`, `go test`, and `go build`. Copy it to `.github/workflows/ci.yml` on `main` to enable Actions.
 
 ---
 
