@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "trajectory-ir": {
+      "command": "__TRAJIR_MCP_BIN__",
+      "args": [],
+      "env": {
+        "TRAJIR_MCP_ROOT": "__PROJECT_ROOT__"
+      }
+    }
+  }
+}
