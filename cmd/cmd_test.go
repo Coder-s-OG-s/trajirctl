@@ -167,11 +167,14 @@ func TestRunVerifyRequireSignatureFailsClosed(t *testing.T) {
 
 	var buf bytes.Buffer
 	result, err := RunVerify([]string{"--path", dest, "--require-signature"}, &buf)
-	if err != nil {
-		t.Fatalf("expected a 'failed' result, not a Go error: %v", err)
+	if err == nil {
+		t.Fatal("expected a non-nil error so the CLI exits non-zero on status=failed")
 	}
 	if result.Status != "failed" || result.Verified {
 		t.Fatalf("result=%+v", result)
+	}
+	if buf.Len() == 0 {
+		t.Fatal("expected failed status to still be rendered to stdout before the error")
 	}
 }
 
@@ -222,10 +225,59 @@ func TestRunNodesShowNotFound(t *testing.T) {
 		"--trajectory", fixtureTrajectory,
 		"--id", "does-not-exist",
 	}, &buf)
-	if err != nil {
-		t.Fatal(err)
+	if err == nil {
+		t.Fatal("expected a non-nil error so the CLI exits non-zero when the node is missing")
 	}
 	if result.Found {
 		t.Fatalf("expected not found, got %+v", result)
+	}
+	if buf.Len() == 0 {
+		t.Fatal("expected not-found message to still be rendered to stdout before the error")
+	}
+}
+
+func TestRunImportAcceptsPathFlag(t *testing.T) {
+	dir := t.TempDir()
+	buildFixture(t, dir)
+	dest := filepath.Join(dir, "out.tir")
+	if _, err := RunExport([]string{
+		"--workdir", dir,
+		"--tenant", fixtureTenant,
+		"--trajectory", fixtureTrajectory,
+		"--dest", dest,
+	}, &bytes.Buffer{}); err != nil {
+		t.Fatal(err)
+	}
+
+	var buf bytes.Buffer
+	result, err := RunImport([]string{"--path", dest}, &buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.NodeCount != 2 {
+		t.Fatalf("importResult=%+v", result)
+	}
+}
+
+func TestRunVerifyAcceptsSrcAlias(t *testing.T) {
+	dir := t.TempDir()
+	buildFixture(t, dir)
+	dest := filepath.Join(dir, "out.tir")
+	if _, err := RunExport([]string{
+		"--workdir", dir,
+		"--tenant", fixtureTenant,
+		"--trajectory", fixtureTrajectory,
+		"--dest", dest,
+	}, &bytes.Buffer{}); err != nil {
+		t.Fatal(err)
+	}
+
+	var buf bytes.Buffer
+	result, err := RunVerify([]string{"--src", dest}, &buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Status != "unsigned" {
+		t.Fatalf("result=%+v", result)
 	}
 }
