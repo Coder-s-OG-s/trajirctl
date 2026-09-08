@@ -1,4 +1,4 @@
-# Print a ready-to-paste mcpServers block after you build trajir-mcp.
+# Print a ready to paste mcpServers block after you build trajir-mcp.
 # Usage:
 #   .\scripts\install-mcp-example.ps1 -Bin C:\path\to\trajir-mcp.exe -Root C:\path\to\project
 param(

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Print a ready-to-paste mcpServers block after you build trajir-mcp.
+# Print a ready to paste mcpServers block after you build trajir-mcp.
 # Usage:
 #   ./scripts/install-mcp-example.sh /abs/path/to/trajir-mcp /abs/path/to/project
 set -euo pipefail
